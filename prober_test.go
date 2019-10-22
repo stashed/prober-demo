@@ -25,12 +25,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/tamalsaha/prober-demo/results"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/tools/record"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	containertest "k8s.io/kubernetes/pkg/kubelet/container/testing"
-	"github.com/tamalsaha/prober-demo/prober/results"
 	"k8s.io/kubernetes/pkg/kubelet/util/ioutils"
 	"kmodules.xyz/client-go/tools/probe"
 	execprobe "kmodules.xyz/client-go/tools/probe/exec"

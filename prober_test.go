@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package prober
+package main
 
 import (
 	"bytes"
@@ -30,10 +30,10 @@ import (
 	"k8s.io/client-go/tools/record"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	containertest "k8s.io/kubernetes/pkg/kubelet/container/testing"
-	"k8s.io/kubernetes/pkg/kubelet/prober/results"
+	"github.com/tamalsaha/prober-demo/prober/results"
 	"k8s.io/kubernetes/pkg/kubelet/util/ioutils"
-	"k8s.io/kubernetes/pkg/probe"
-	execprobe "k8s.io/kubernetes/pkg/probe/exec"
+	"kmodules.xyz/client-go/tools/probe"
+	execprobe "kmodules.xyz/client-go/tools/probe/exec"
 )
 
 func TestFormatURL(t *testing.T) {

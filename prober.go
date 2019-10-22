@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package prober
+package main
 
 import (
 	"fmt"
@@ -31,12 +31,12 @@ import (
 	"k8s.io/client-go/tools/record"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	"k8s.io/kubernetes/pkg/kubelet/events"
-	"k8s.io/kubernetes/pkg/kubelet/prober/results"
+	"github.com/tamalsaha/prober-demo/prober/results"
 	"k8s.io/kubernetes/pkg/kubelet/util/format"
-	"k8s.io/kubernetes/pkg/probe"
-	execprobe "k8s.io/kubernetes/pkg/probe/exec"
-	httpprobe "k8s.io/kubernetes/pkg/probe/http"
-	tcpprobe "k8s.io/kubernetes/pkg/probe/tcp"
+	"kmodules.xyz/client-go/tools/probe"
+	execprobe "kmodules.xyz/client-go/tools/probe/exec"
+	httpprobe "kmodules.xyz/client-go/tools/probe/http"
+	tcpprobe "kmodules.xyz/client-go/tools/probe/tcp"
 	"k8s.io/utils/exec"
 
 	"k8s.io/klog"

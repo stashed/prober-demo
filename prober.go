@@ -27,12 +27,12 @@ import (
 	"time"
 
 	"github.com/tamalsaha/prober-demo/events"
-	"github.com/tamalsaha/prober-demo/results"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/tools/record"
 	"k8s.io/klog"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
+	kresults "k8s.io/kubernetes/pkg/kubelet/prober/results"
 	"k8s.io/utils/exec"
 	"kmodules.xyz/client-go/tools/probe"
 	execprobe "kmodules.xyz/client-go/tools/probe/exec"
@@ -102,7 +102,7 @@ func newProber(
 }
 
 // probe probes the container.
-func (pb *prober) probe(probeType probeType, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID ContainerID) (results.Result, error) {
+func (pb *prober) probe(probeType probeType, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID kubecontainer.ContainerID) (kresults.Result, error) {
 	var probeSpec *v1.Probe
 	switch probeType {
 	case readiness:
@@ -112,13 +112,13 @@ func (pb *prober) probe(probeType probeType, pod *v1.Pod, status v1.PodStatus, c
 	//case startup:
 	//	probeSpec = container.StartupProbe
 	default:
-		return results.Failure, fmt.Errorf("unknown probe type: %q", probeType)
+		return kresults.Failure, fmt.Errorf("unknown probe type: %q", probeType)
 	}
 
 	ctrName := fmt.Sprintf("%s:%s", Pod(pod), container.Name)
 	if probeSpec == nil {
 		klog.Warningf("%s probe for %s is nil", probeType, ctrName)
-		return results.Success, nil
+		return kresults.Success, nil
 	}
 
 	result, output, err := pb.runProbeWithRetries(probeType, probeSpec, pod, status, container, containerID, maxProbeRetries)
@@ -139,7 +139,7 @@ func (pb *prober) probe(probeType probeType, pod *v1.Pod, status v1.PodStatus, c
 				pb.recorder.Eventf(ref, v1.EventTypeWarning, events.ContainerUnhealthy, "%s probe failed: %s", probeType, output)
 			}
 		}
-		return results.Failure, err
+		return kresults.Failure, err
 	}
 	if result == probe.Warning {
 		if ref, hasRef := pb.refManager.GetRef(containerID); hasRef {
@@ -149,12 +149,12 @@ func (pb *prober) probe(probeType probeType, pod *v1.Pod, status v1.PodStatus, c
 	} else {
 		klog.V(3).Infof("%s probe for %q succeeded", probeType, ctrName)
 	}
-	return results.Success, nil
+	return kresults.Success, nil
 }
 
 // runProbeWithRetries tries to probe the container in a finite loop, it returns the last result
 // if it never succeeds.
-func (pb *prober) runProbeWithRetries(probeType probeType, p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID ContainerID, retries int) (probe.Result, string, error) {
+func (pb *prober) runProbeWithRetries(probeType probeType, p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID kubecontainer.ContainerID, retries int) (probe.Result, string, error) {
 	var err error
 	var result probe.Result
 	var output string
@@ -177,7 +177,7 @@ func buildHeader(headerList []v1.HTTPHeader) http.Header {
 	return headers
 }
 
-func (pb *prober) runProbe(probeType probeType, p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID ContainerID) (probe.Result, string, error) {
+func (pb *prober) runProbe(probeType probeType, p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container, containerID kubecontainer.ContainerID) (probe.Result, string, error) {
 	timeout := time.Duration(p.TimeoutSeconds) * time.Second
 	if p.Exec != nil {
 		klog.V(4).Infof("Exec-Probe Pod: %v, Container: %v, Command: %v", pod, container, p.Exec.Command)
@@ -277,7 +277,7 @@ type execInContainer struct {
 	writer io.Writer
 }
 
-func (pb *prober) newExecInContainer(container v1.Container, containerID ContainerID, cmd []string, timeout time.Duration) exec.Cmd {
+func (pb *prober) newExecInContainer(container v1.Container, containerID kubecontainer.ContainerID, cmd []string, timeout time.Duration) exec.Cmd {
 	return &execInContainer{run: func() ([]byte, error) {
 		return pb.runner.RunInContainer(containerID, cmd, timeout)
 	}}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"k8s.io/klog"
+	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 	"strings"
 	"time"
 )
@@ -55,5 +56,5 @@ func (c *ContainerID) UnmarshalJSON(data []byte) error {
 type ContainerCommandRunner interface {
 	// RunInContainer synchronously executes the command in the container, and returns the output.
 	// If the command completes with a non-0 exit code, a k8s.io/utils/exec.ExitError will be returned.
-	RunInContainer(id ContainerID, cmd []string, timeout time.Duration) ([]byte, error)
+	RunInContainer(id kubecontainer.ContainerID, cmd []string, timeout time.Duration) ([]byte, error)
 }

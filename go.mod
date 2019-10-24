@@ -3,15 +3,17 @@ module github.com/tamalsaha/prober-demo
 go 1.12
 
 require (
+	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
+	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
+	github.com/spf13/cobra v0.0.3
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/crypto v0.0.0-20190424203555-c05e17bb3b2d // indirect
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6 // indirect
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a // indirect
-	golang.org/x/sys v0.0.0-20190425145619-16072639606e // indirect
 	golang.org/x/text v0.3.1 // indirect
 	k8s.io/api v0.0.0-20190503110853-61630f889b3c
 	k8s.io/apiextensions-apiserver v0.0.0-20190516231611-bf6753f2aa24 // indirect

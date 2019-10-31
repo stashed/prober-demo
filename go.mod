@@ -5,12 +5,14 @@ go 1.12
 require (
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/gogo/protobuf v1.2.1 // indirect
+	github.com/gorilla/mux v1.6.2
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
+	github.com/hokaccha/go-prettyjson v0.0.0-20190818114111-108c894c2c0e // indirect
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
 	github.com/spf13/cobra v0.0.3
-	github.com/stretchr/testify v1.3.0
+	github.com/the-redback/go-oneliners v0.0.0-20190417084731-74f7694e6dae
 	golang.org/x/crypto v0.0.0-20190424203555-c05e17bb3b2d // indirect
 	golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6 // indirect
 	golang.org/x/oauth2 v0.0.0-20190402181905-9f3314589c9a // indirect

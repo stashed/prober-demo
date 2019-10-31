@@ -13,6 +13,8 @@ github.com/docker/spdystream
 github.com/docker/spdystream/spdy
 # github.com/evanphx/json-patch v4.5.0+incompatible
 github.com/evanphx/json-patch
+# github.com/fatih/color v1.7.0
+github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.4.7
 github.com/fsnotify/fsnotify
 # github.com/gogo/protobuf v1.2.1
@@ -38,13 +40,23 @@ github.com/google/gofuzz
 github.com/googleapis/gnostic/OpenAPIv2
 github.com/googleapis/gnostic/compiler
 github.com/googleapis/gnostic/extensions
+# github.com/gorilla/context v1.1.1
+github.com/gorilla/context
+# github.com/gorilla/mux v1.6.2
+github.com/gorilla/mux
 # github.com/hashicorp/golang-lru v0.5.1
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
+# github.com/hokaccha/go-prettyjson v0.0.0-20190818114111-108c894c2c0e
+github.com/hokaccha/go-prettyjson
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
 # github.com/json-iterator/go v1.1.6
 github.com/json-iterator/go
+# github.com/mattn/go-colorable v0.1.2
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.8
+github.com/mattn/go-isatty
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
@@ -81,8 +93,10 @@ github.com/spf13/pflag
 # github.com/stretchr/objx v0.1.1
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.3.0
-github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
+github.com/stretchr/testify/assert
+# github.com/the-redback/go-oneliners v0.0.0-20190417084731-74f7694e6dae
+github.com/the-redback/go-oneliners
 # golang.org/x/crypto v0.0.0-20190424203555-c05e17bb3b2d
 golang.org/x/crypto/ssh/terminal
 # golang.org/x/net v0.0.0-20190424112056-4829fb13d2c6
@@ -454,8 +468,6 @@ k8s.io/kubernetes/pkg/kubelet/types
 k8s.io/kubernetes/pkg/util/pod
 k8s.io/kubernetes/pkg/kubelet/container/testing
 k8s.io/kubernetes/pkg/kubelet/status/testing
-k8s.io/kubernetes/pkg/probe
-k8s.io/kubernetes/pkg/probe/exec
 k8s.io/kubernetes/pkg/util/mount
 k8s.io/kubernetes/pkg/volume/util/fs
 k8s.io/kubernetes/pkg/volume/util/recyclerclient

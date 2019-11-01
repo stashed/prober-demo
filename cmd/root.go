@@ -6,8 +6,8 @@ import (
 
 func NewRootCmd() *cobra.Command  {
 	rootCmd := &cobra.Command{
-		Use:   "run",
-		Short: "run client or prober",
+		Use:   "prober",
+		Short: "prober root command",
 	}
 	rootCmd.AddCommand(NewCmdRunProbe())
 	rootCmd.AddCommand(NewCmdRunClient())

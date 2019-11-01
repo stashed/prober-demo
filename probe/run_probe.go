@@ -37,7 +37,22 @@ func RunProbes() error {
 				},
 			},
 		},
-
+		{
+			Handler: v1.Handler{
+				TCPSocket: &v1.TCPSocketAction{
+					Port: intstr.IntOrString{Type: intstr.Int, IntVal: 9090},
+					Host: "127.0.0.1",
+				},
+			},
+		},
+		{
+			Handler: v1.Handler{
+				TCPSocket: &v1.TCPSocketAction{
+					Port: intstr.IntOrString{Type: intstr.Int, IntVal: 9091},
+					Host: "127.0.0.1",
+				},
+			},
+		},
 	}
 
 	pod := &v1.Pod{}

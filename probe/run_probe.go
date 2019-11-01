@@ -3,14 +3,16 @@ package probe
 import (
 	"fmt"
 
-	"github.com/the-redback/go-oneliners"
 	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/record"
+	podutil "k8s.io/kubernetes/pkg/api/v1/pod"
 	kubecontainer "k8s.io/kubernetes/pkg/kubelet/container"
 )
 
-func RunProbes() error {
+func RunProbes(kubeClient kubernetes.Interface) error {
 	refManager := kubecontainer.NewRefManager()
 	recorder := &record.FakeRecorder{}
 
@@ -53,12 +55,28 @@ func RunProbes() error {
 				},
 			},
 		},
+		{
+			Handler: v1.Handler{
+				Exec: &v1.ExecAction{
+					Command: []string{"echo", "hello world"},
+				},
+			},
+		},
 	}
 
-	pod := &v1.Pod{}
-	status := v1.PodStatus{}
-	container := v1.Container{}
-	containerID := kubecontainer.ContainerID{}
+	pod, err := kubeClient.CoreV1().Pods("default").Get("prober-demo", metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	status := pod.Status
+	container := pod.Spec.Containers[0]
+
+	containerStatus, ok := podutil.GetContainerStatus(status.ContainerStatuses, container.Name)
+	if !ok || len(containerStatus.ContainerID) == 0 {
+		return fmt.Errorf("failed to extract containerStatus")
+	}
+
+	containerID := kubecontainer.ParseContainerID(containerStatus.ContainerID)
 
 	pb := newProber(nil, refManager, recorder)
 
@@ -67,8 +85,8 @@ func RunProbes() error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("ss: ", ss)
-		oneliners.PrettyJson(result, "result")
+		fmt.Printf("============== Probe No: %d =================\n", i)
+		fmt.Printf("Result: %v\nReason: %v\n", result, ss)
 	}
 
 	return nil

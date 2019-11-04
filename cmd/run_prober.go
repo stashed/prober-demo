@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tamalsaha/prober-demo/probe"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"log"
@@ -23,8 +22,8 @@ func NewCmdRunProbe() *cobra.Command {
 			if err != nil {
 				log.Fatalf("Could not get Kubernetes config: %s", err)
 			}
-			kubeClient := kubernetes.NewForConfigOrDie(config)
-			return probe.RunProbes(kubeClient)
+
+			return probe.RunProbes(config)
 		},
 	}
 	return cmd

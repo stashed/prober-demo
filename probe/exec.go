@@ -16,56 +16,43 @@ limitations under the License.
 
 package probe
 
-//import (
-//	"bytes"
-//
-//	"k8s.io/kubernetes/pkg/kubelet/util/ioutils"
-//
-//	"k8s.io/klog"
-//	"k8s.io/utils/exec"
-//)
-//
-//const (
-//	maxReadLength = 10 * 1 << 10 // 10KB
-//)
-//
-//// New creates a ExecProber.
-//func NewExec() ExecProber {
-//	return execProber{}
-//}
-//
-//// ExecProber is an interface defining the Probe object for container readiness/liveness checks.
-//type ExecProber interface {
-//	Probe(e exec.Cmd) (Result, string, error)
-//}
-//
-//type execProber struct{}
-//
-//// Probe executes a command to check the liveness/readiness of container
-//// from executing a command. Returns the Result status, command output, and
-//// errors if any.
-//func (pr execProber) Probe(e exec.Cmd) (Result, string, error) {
-//	var dataBuffer bytes.Buffer
-//	writer := ioutils.LimitWriter(&dataBuffer, maxReadLength)
-//
-//	e.SetStderr(writer)
-//	e.SetStdout(writer)
-//	err := e.Start()
-//	if err == nil {
-//		err = e.Wait()
-//	}
-//	data := dataBuffer.Bytes()
-//
-//	klog.V(4).Infof("Exec probe response: %q", string(data))
-//	if err != nil {
-//		exit, ok := err.(exec.ExitError)
-//		if ok {
-//			if exit.ExitStatus() == 0 {
-//				return Success, string(data), nil
-//			}
-//			return Failure, string(data), nil
-//		}
-//		return Unknown, "", err
-//	}
-//	return Success, string(data), nil
-//}
+import (
+	"fmt"
+
+	core "k8s.io/api/core/v1"
+	"k8s.io/client-go/rest"
+	exec_util "kmodules.xyz/client-go/tools/exec"
+)
+
+const (
+	maxReadLength = 10 * 1 << 10 // 10KB
+)
+
+// New creates a ExecProber.
+func NewExecProber() ExecProber {
+	return execProber{}
+}
+
+// ExecProber is an interface defining the Probe object for container readiness/liveness checks.
+type ExecProber interface {
+	Probe(config *rest.Config, pod *core.Pod, container core.Container, commands []string) (Result, string, error)
+}
+
+type execProber struct{}
+
+// Probe executes a command to check the liveness/readiness of container
+// from executing a command. Returns the Result status, command output, and
+// errors if any.
+func (pr execProber) Probe(config *rest.Config, pod *core.Pod, container core.Container, commands []string) (Result, string, error) {
+
+	fmt.Println("Running command: ",commands)
+	data, err := exec_util.ExecIntoPod(config, pod, func(opt *exec_util.Options) {
+		opt.Container = container.Name
+		opt.Command = commands
+	})
+
+	if err != nil {
+		return Failure, data, nil
+	}
+	return Success, data, nil
+}

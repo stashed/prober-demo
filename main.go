@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/tamalsaha/prober-demo/cmd"
+	"stash.appscode.dev/prober-demo/pkg/cmd"
 	"log"
 )
 
 func main() {
-	err:=cmd.NewRootCmd().Execute()
+	err:= cmd.NewRootCmd().Execute()
 	if err!=nil{
 		log.Fatal(err)
 	}

@@ -2,7 +2,7 @@
 set -xeou pipefail
 
 GOPATH=$(go env GOPATH)
-REPO_ROOT=$GOPATH/src/github.com/tamalsaha/prober-demo
+REPO_ROOT=$GOPATH/src/stash.appscode.dev/prober-demo
 REGISTRY=emruzhossain
 BINARY_NAME=prober-demo
 

@@ -6,8 +6,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	v1 "stash.appscode.dev/prober-demo/api/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

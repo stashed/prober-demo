@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/tamalsaha/prober-demo/probe"
+	"stash.appscode.dev/prober-demo/pkg/probe"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"log"

@@ -21,13 +21,14 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"stash.appscode.dev/prober-demo/api/v1"
 	"strconv"
 	"strings"
 	"time"
 
 	"k8s.io/client-go/rest"
 
-	v1 "k8s.io/api/core/v1"
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/klog"
 )
@@ -75,7 +76,7 @@ func buildHeader(headerList []v1.HTTPHeader) http.Header {
 	return headers
 }
 
-func (pb *prober) runProbe(p *v1.Probe, pod *v1.Pod, status v1.PodStatus, container v1.Container) (Result, string, error) {
+func (pb *prober) runProbe(p *v1.Probe, pod *core.Pod, status core.PodStatus, container core.Container) (Result, string, error) {
 	timeout := time.Duration(p.TimeoutSeconds) * time.Second
 	if p.Exec != nil {
 		klog.V(4).Infof("Exec-Probe Pod: %v, Container: %v, Command: %v", pod, container, p.Exec.Command)
@@ -114,7 +115,7 @@ func (pb *prober) runProbe(p *v1.Probe, pod *v1.Pod, status v1.PodStatus, contai
 	return Unknown, "", fmt.Errorf("missing probe handler for %s:%s", Pod(pod), container.Name)
 }
 
-func extractPort(param intstr.IntOrString, container v1.Container) (int, error) {
+func extractPort(param intstr.IntOrString, container core.Container) (int, error) {
 	port := -1
 	var err error
 	switch param.Type {
@@ -137,7 +138,7 @@ func extractPort(param intstr.IntOrString, container v1.Container) (int, error) 
 }
 
 // findPortByName is a helper function to look up a port in a container by name.
-func findPortByName(container v1.Container, portName string) (int, error) {
+func findPortByName(container core.Container, portName string) (int, error) {
 	for _, port := range container.Ports {
 		if port.Name == portName {
 			return int(port.ContainerPort), nil

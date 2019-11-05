@@ -35,10 +35,10 @@ const (
 	maxRespBodyLength = 10 * 1 << 10 // 10KB
 )
 
-// New creates HttpProber that will skip TLS verification while probing.
+// New creates HttpGetProber that will skip TLS verification while probing.
 // followNonLocalRedirects configures whether the prober should follow redirects to a different hostname.
 //   If disabled, redirects to other hosts will trigger a warning result.
-func NewHTTPProber(followNonLocalRedirects bool) HttpProber {
+func NewHTTPGetProber(followNonLocalRedirects bool) HttpGetProber {
 	tlsConfig := &tls.Config{InsecureSkipVerify: true}
 	return NewWithTLSConfig(tlsConfig, followNonLocalRedirects)
 }
@@ -46,7 +46,7 @@ func NewHTTPProber(followNonLocalRedirects bool) HttpProber {
 // NewWithTLSConfig takes tls config as parameter.
 // followNonLocalRedirects configures whether the prober should follow redirects to a different hostname.
 //   If disabled, redirects to other hosts will trigger a warning result.
-func NewWithTLSConfig(config *tls.Config, followNonLocalRedirects bool) HttpProber {
+func NewWithTLSConfig(config *tls.Config, followNonLocalRedirects bool) HttpGetProber {
 	// We do not want the probe use node's local proxy set.
 	transport := utilnet.SetTransportDefaults(
 		&http.Transport{
@@ -54,27 +54,27 @@ func NewWithTLSConfig(config *tls.Config, followNonLocalRedirects bool) HttpProb
 			DisableKeepAlives: true,
 			Proxy:             http.ProxyURL(nil),
 		})
-	return httpProber{transport, followNonLocalRedirects}
+	return httpGetProber{transport, followNonLocalRedirects}
 }
 
-// HttpProber is an interface that defines the Probe function for doing HTTP readiness/liveness checks.
-type HttpProber interface {
+// HttpGetProber is an interface that defines the Probe function for doing HTTP readiness/liveness checks.
+type HttpGetProber interface {
 	Probe(url *url.URL, headers http.Header, timeout time.Duration) (Result, string, error)
 }
 
-type httpProber struct {
+type httpGetProber struct {
 	transport               *http.Transport
 	followNonLocalRedirects bool
 }
 
 // Probe returns a ProbeRunner capable of running an HTTP check.
-func (pr httpProber) Probe(url *url.URL, headers http.Header, timeout time.Duration) (Result, string, error) {
+func (pr httpGetProber) Probe(url *url.URL, headers http.Header, timeout time.Duration) (Result, string, error) {
 	client := &http.Client{
 		Timeout:       timeout,
 		Transport:     pr.transport,
 		CheckRedirect: redirectChecker(pr.followNonLocalRedirects),
 	}
-	return DoHTTPProbe(url, headers, client)
+	return DoHTTPGetProbe(url, headers, client)
 }
 
 // GetHTTPInterface is an interface for making HTTP requests, that returns a response and error.
@@ -82,11 +82,11 @@ type GetHTTPInterface interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// DoHTTPProbe checks if a GET request to the url succeeds.
+// DoHTTPGetProbe checks if a GET request to the url succeeds.
 // If the HTTP response code is successful (i.e. 400 > code >= 200), it returns Success.
 // If the HTTP response code is unsuccessful or HTTP communication fails, it returns Failure.
 // This is exported because some other packages may want to do direct HTTP probes.
-func DoHTTPProbe(url *url.URL, headers http.Header, client GetHTTPInterface) (Result, string, error) {
+func DoHTTPGetProbe(url *url.URL, headers http.Header, client GetHTTPInterface) (Result, string, error) {
 	req, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
 		// Convert errors into failures to catch timeouts.

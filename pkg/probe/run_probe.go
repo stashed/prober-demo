@@ -39,6 +39,48 @@ func RunProbes(config *rest.Config) error {
 		},
 		{
 			Handler: v1.Handler{
+				HTTPPost: &v1.HTTPPostAction{
+					Path:        "/post-demo",
+					Port:        intstr.IntOrString{Type: intstr.Int, IntVal: 8080},
+					Host:        "127.0.0.1",
+					Scheme:      "HTTP",
+					HTTPHeaders: nil,
+					Body: "This is HTTP POST request body",
+				},
+			},
+		},
+		{
+			Handler: v1.Handler{
+				HTTPPost: &v1.HTTPPostAction{
+					Path:        "/post-demo",
+					Port:        intstr.IntOrString{Type: intstr.Int, IntVal: 8080},
+					Host:        "127.0.0.1",
+					Scheme:      "HTTP",
+					HTTPHeaders: nil,
+					Form: map[string][]string{
+						"expected-response": {"Accepted"},
+						"expected-response-code": {"202"},
+					},
+				},
+			},
+		},
+		{
+			Handler: v1.Handler{
+				HTTPPost: &v1.HTTPPostAction{
+					Path:        "/post-demo",
+					Port:        intstr.IntOrString{Type: intstr.Int, IntVal: 8080},
+					Host:        "127.0.0.1",
+					Scheme:      "HTTP",
+					HTTPHeaders: nil,
+					Form: map[string][]string{
+						"expected-response": {"Bad Request"},
+						"expected-response-code": {"400"},
+					},
+				},
+			},
+		},
+		{
+			Handler: v1.Handler{
 				TCPSocket: &v1.TCPSocketAction{
 					Port: intstr.IntOrString{Type: intstr.Int, IntVal: 9090},
 					Host: "127.0.0.1",
@@ -56,14 +98,14 @@ func RunProbes(config *rest.Config) error {
 		{
 			Handler: v1.Handler{
 				Exec: &v1.ExecAction{
-					Command: []string{"/bin/sh", "-c",`exit $EXIT_CODE_SUCCESS`},
+					Command: []string{"/bin/sh", "-c", `exit $EXIT_CODE_SUCCESS`},
 				},
 			},
 		},
 		{
 			Handler: v1.Handler{
 				Exec: &v1.ExecAction{
-					Command: []string{"/bin/sh", "-c",`exit $EXIT_CODE_FAIL`},
+					Command: []string{"/bin/sh", "-c", `exit $EXIT_CODE_FAIL`},
 				},
 			},
 		},

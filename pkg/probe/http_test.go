@@ -68,7 +68,7 @@ func TestHTTPProbeProxy(t *testing.T) {
 	defer unsetEnv("NO_PROXY")()
 
 	followNonLocalRedirects := true
-	prober := NewHTTPProber(followNonLocalRedirects)
+	prober := NewHTTPGetProber(followNonLocalRedirects)
 
 	go func() {
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +124,7 @@ func TestHTTPProbeChecker(t *testing.T) {
 	}
 
 	followNonLocalRedirects := true
-	prober := NewHTTPProber(followNonLocalRedirects)
+	prober := NewHTTPGetProber(followNonLocalRedirects)
 	testCases := []struct {
 		handler    func(w http.ResponseWriter, r *http.Request)
 		reqHeaders http.Header
@@ -302,7 +302,7 @@ func TestHTTPProbeChecker_NonLocalRedirects(t *testing.T) {
 	for desc, test := range testCases {
 		t.Run(desc+"-local", func(t *testing.T) {
 			followNonLocalRedirects := false
-			prober := NewHTTPProber(followNonLocalRedirects)
+			prober := NewHTTPGetProber(followNonLocalRedirects)
 			target, err := url.Parse(server.URL + "/redirect?loc=" + url.QueryEscape(test.redirect))
 			require.NoError(t, err)
 			result, _, _ := prober.Probe(target, nil, wait.ForeverTestTimeout)
@@ -310,7 +310,7 @@ func TestHTTPProbeChecker_NonLocalRedirects(t *testing.T) {
 		})
 		t.Run(desc+"-nonlocal", func(t *testing.T) {
 			followNonLocalRedirects := true
-			prober := NewHTTPProber(followNonLocalRedirects)
+			prober := NewHTTPGetProber(followNonLocalRedirects)
 			target, err := url.Parse(server.URL + "/redirect?loc=" + url.QueryEscape(test.redirect))
 			require.NoError(t, err)
 			result, _, _ := prober.Probe(target, nil, wait.ForeverTestTimeout)
@@ -352,7 +352,7 @@ func TestHTTPProbeChecker_HostHeaderPreservedAfterRedirect(t *testing.T) {
 		headers.Add("Host", test.hostHeader)
 		t.Run(desc+"local", func(t *testing.T) {
 			followNonLocalRedirects := false
-			prober := NewHTTPProber(followNonLocalRedirects)
+			prober := NewHTTPGetProber(followNonLocalRedirects)
 			target, err := url.Parse(server.URL + "/redirect")
 			require.NoError(t, err)
 			result, _, _ := prober.Probe(target, headers, wait.ForeverTestTimeout)
@@ -360,7 +360,7 @@ func TestHTTPProbeChecker_HostHeaderPreservedAfterRedirect(t *testing.T) {
 		})
 		t.Run(desc+"nonlocal", func(t *testing.T) {
 			followNonLocalRedirects := true
-			prober := NewHTTPProber(followNonLocalRedirects)
+			prober := NewHTTPGetProber(followNonLocalRedirects)
 			target, err := url.Parse(server.URL + "/redirect")
 			require.NoError(t, err)
 			result, _, _ := prober.Probe(target, headers, wait.ForeverTestTimeout)
@@ -393,7 +393,7 @@ func TestHTTPProbeChecker_PayloadTruncated(t *testing.T) {
 	headers := http.Header{}
 	headers.Add("Host", successHostHeader)
 	t.Run("truncated payload", func(t *testing.T) {
-		prober := NewHTTPProber(false)
+		prober := NewHTTPGetProber(false)
 		target, err := url.Parse(server.URL + "/success")
 		require.NoError(t, err)
 		result, body, err := prober.Probe(target, headers, wait.ForeverTestTimeout)
@@ -426,7 +426,7 @@ func TestHTTPProbeChecker_PayloadNormal(t *testing.T) {
 	headers := http.Header{}
 	headers.Add("Host", successHostHeader)
 	t.Run("normal payload", func(t *testing.T) {
-		prober := NewHTTPProber(false)
+		prober := NewHTTPGetProber(false)
 		target, err := url.Parse(server.URL + "/success")
 		require.NoError(t, err)
 		result, body, err := prober.Probe(target, headers, wait.ForeverTestTimeout)

@@ -48,7 +48,8 @@ const (
 )
 
 type prober struct {
-	httpGet HttpProber
+	httpGet HttpGetProber
+	httpPost HttpPostProber
 	tcp     TcpProber
 	exec    ExecProber
 	config  *rest.Config
@@ -59,7 +60,8 @@ func newProber(config *rest.Config) *prober {
 	const followNonLocalRedirects = false
 
 	return &prober{
-		httpGet: NewHTTPProber(followNonLocalRedirects),
+		httpGet: NewHTTPGetProber(followNonLocalRedirects),
+		httpPost: NewHTTPPostProber(followNonLocalRedirects),
 		tcp:     NewTcpProber(),
 		exec:    NewExecProber(),
 		config:  config,
@@ -98,6 +100,23 @@ func (pb *prober) runProbe(p *v1.Probe, pod *core.Pod, status core.PodStatus, co
 		headers := buildHeader(p.HTTPGet.HTTPHeaders)
 		klog.V(4).Infof("HTTP-Probe Headers: %v", headers)
 		return pb.httpGet.Probe(targetURL, headers, timeout)
+	}
+	if p.HTTPPost != nil {
+		scheme := strings.ToLower(string(p.HTTPPost.Scheme))
+		host := p.HTTPPost.Host
+		if host == "" {
+			host = status.PodIP
+		}
+		port, err := extractPort(p.HTTPPost.Port, container)
+		if err != nil {
+			return Unknown, "", err
+		}
+		path := p.HTTPPost.Path
+		klog.V(4).Infof("HTTP-Probe Host: %v://%v, Port: %v, Path: %v", scheme, host, port, path)
+		targetURL := formatURL(scheme, host, port, path)
+		headers := buildHeader(p.HTTPPost.HTTPHeaders)
+		klog.V(4).Infof("HTTP-Probe Headers: %v", headers)
+		return pb.httpPost.Probe(targetURL, headers, p.HTTPPost.Form,p.HTTPPost.Body, timeout)
 	}
 	if p.TCPSocket != nil {
 		port, err := extractPort(p.TCPSocket.Port, container)

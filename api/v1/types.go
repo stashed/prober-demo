@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"net/url"
+
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -42,6 +44,9 @@ type Handler struct {
 	// HTTPGet specifies the http request to perform.
 	// +optional
 	HTTPGet *HTTPGetAction `json:"httpGet,omitempty"`
+	// HTTPPost specifies the http post request to perform.
+	// +optional
+	HTTPPost *HTTPPostAction `json:"httpPost,omitempty"`
 	// TCPSocket specifies an action involving a TCP port.
 	// TCP hooks not yet supported
 	// TODO: implement a realistic TCP lifecycle hook
@@ -80,6 +85,34 @@ type HTTPGetAction struct {
 	// Custom headers to set in the request. HTTP allows repeated headers.
 	// +optional
 	HTTPHeaders []HTTPHeader `json:"httpHeaders,omitempty"`
+}
+
+// HTTPPostAction describes an action based on HTTP Get requests.
+type HTTPPostAction struct {
+	// Path to access on the HTTP server.
+	// +optional
+	Path string `json:"path,omitempty"`
+	// Name or number of the port to access on the container.
+	// Number must be in the range 1 to 65535.
+	// Name must be an IANA_SVC_NAME.
+	Port intstr.IntOrString `json:"port"`
+	// Host name to connect to, defaults to the pod IP. You probably want to set
+	// "Host" in httpHeaders instead.
+	// +optional
+	Host string `json:"host,omitempty"`
+	// Scheme to use for connecting to the host.
+	// Defaults to HTTP.
+	// +optional
+	Scheme URIScheme `json:"scheme,omitempty"`
+	// Custom headers to set in the request. HTTP allows repeated headers.
+	// +optional
+	HTTPHeaders []HTTPHeader `json:"httpHeaders,omitempty"`
+	// Form values to send with the request.
+	// +optional
+	Form url.Values `json:"form,omitempty"`
+	// Body to send with the request.
+	// +optional
+	Body string `json:"body,omitempty"`
 }
 
 // TCPSocketAction describes an action based on opening a socket

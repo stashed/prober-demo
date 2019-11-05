@@ -31,6 +31,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"stash.appscode.dev/prober-demo/api/v1.ExecAction":      schema_stashappscodedev_prober_demo_api_v1_ExecAction(ref),
 		"stash.appscode.dev/prober-demo/api/v1.HTTPGetAction":   schema_stashappscodedev_prober_demo_api_v1_HTTPGetAction(ref),
 		"stash.appscode.dev/prober-demo/api/v1.HTTPHeader":      schema_stashappscodedev_prober_demo_api_v1_HTTPHeader(ref),
+		"stash.appscode.dev/prober-demo/api/v1.HTTPPostAction":  schema_stashappscodedev_prober_demo_api_v1_HTTPPostAction(ref),
 		"stash.appscode.dev/prober-demo/api/v1.Handler":         schema_stashappscodedev_prober_demo_api_v1_Handler(ref),
 		"stash.appscode.dev/prober-demo/api/v1.Probe":           schema_stashappscodedev_prober_demo_api_v1_Probe(ref),
 		"stash.appscode.dev/prober-demo/api/v1.TCPSocketAction": schema_stashappscodedev_prober_demo_api_v1_TCPSocketAction(ref),
@@ -148,6 +149,91 @@ func schema_stashappscodedev_prober_demo_api_v1_HTTPHeader(ref common.ReferenceC
 	}
 }
 
+func schema_stashappscodedev_prober_demo_api_v1_HTTPPostAction(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "HTTPPostAction describes an action based on HTTP Get requests.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"path": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Path to access on the HTTP server.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name or number of the port to access on the container. Number must be in the range 1 to 65535. Name must be an IANA_SVC_NAME.",
+							Ref:         ref("k8s.io/apimachinery/pkg/util/intstr.IntOrString"),
+						},
+					},
+					"host": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Host name to connect to, defaults to the pod IP. You probably want to set \"Host\" in httpHeaders instead.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"scheme": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Scheme to use for connecting to the host. Defaults to HTTP.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"httpHeaders": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Custom headers to set in the request. HTTP allows repeated headers.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Ref: ref("stash.appscode.dev/prober-demo/api/v1.HTTPHeader"),
+									},
+								},
+							},
+						},
+					},
+					"form": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Form values to send with the request.",
+							Type:        []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type: []string{"array"},
+										Items: &spec.SchemaOrArray{
+											Schema: &spec.Schema{
+												SchemaProps: spec.SchemaProps{
+													Type:   []string{"string"},
+													Format: "",
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					"body": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Body to send with the request.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"port"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/util/intstr.IntOrString", "stash.appscode.dev/prober-demo/api/v1.HTTPHeader"},
+	}
+}
+
 func schema_stashappscodedev_prober_demo_api_v1_Handler(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -167,6 +253,12 @@ func schema_stashappscodedev_prober_demo_api_v1_Handler(ref common.ReferenceCall
 							Ref:         ref("stash.appscode.dev/prober-demo/api/v1.HTTPGetAction"),
 						},
 					},
+					"httpPost": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HTTPPost specifies the http post request to perform.",
+							Ref:         ref("stash.appscode.dev/prober-demo/api/v1.HTTPPostAction"),
+						},
+					},
 					"tcpSocket": {
 						SchemaProps: spec.SchemaProps{
 							Description: "TCPSocket specifies an action involving a TCP port. TCP hooks not yet supported",
@@ -177,7 +269,7 @@ func schema_stashappscodedev_prober_demo_api_v1_Handler(ref common.ReferenceCall
 			},
 		},
 		Dependencies: []string{
-			"stash.appscode.dev/prober-demo/api/v1.ExecAction", "stash.appscode.dev/prober-demo/api/v1.HTTPGetAction", "stash.appscode.dev/prober-demo/api/v1.TCPSocketAction"},
+			"stash.appscode.dev/prober-demo/api/v1.ExecAction", "stash.appscode.dev/prober-demo/api/v1.HTTPGetAction", "stash.appscode.dev/prober-demo/api/v1.HTTPPostAction", "stash.appscode.dev/prober-demo/api/v1.TCPSocketAction"},
 	}
 }
 
@@ -198,6 +290,12 @@ func schema_stashappscodedev_prober_demo_api_v1_Probe(ref common.ReferenceCallba
 						SchemaProps: spec.SchemaProps{
 							Description: "HTTPGet specifies the http request to perform.",
 							Ref:         ref("stash.appscode.dev/prober-demo/api/v1.HTTPGetAction"),
+						},
+					},
+					"httpPost": {
+						SchemaProps: spec.SchemaProps{
+							Description: "HTTPPost specifies the http post request to perform.",
+							Ref:         ref("stash.appscode.dev/prober-demo/api/v1.HTTPPostAction"),
 						},
 					},
 					"tcpSocket": {
@@ -245,7 +343,7 @@ func schema_stashappscodedev_prober_demo_api_v1_Probe(ref common.ReferenceCallba
 			},
 		},
 		Dependencies: []string{
-			"stash.appscode.dev/prober-demo/api/v1.ExecAction", "stash.appscode.dev/prober-demo/api/v1.HTTPGetAction", "stash.appscode.dev/prober-demo/api/v1.TCPSocketAction"},
+			"stash.appscode.dev/prober-demo/api/v1.ExecAction", "stash.appscode.dev/prober-demo/api/v1.HTTPGetAction", "stash.appscode.dev/prober-demo/api/v1.HTTPPostAction", "stash.appscode.dev/prober-demo/api/v1.TCPSocketAction"},
 	}
 }
 

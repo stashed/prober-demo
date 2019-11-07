@@ -2,18 +2,23 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
 
 	"github.com/gorilla/mux" // need to use dep for package management
 	"github.com/spf13/cobra"
+	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
+	httpprobe "kmodules.xyz/prober/probe/http"
 )
 
 func NewCmdRunClient() *cobra.Command {
@@ -55,6 +60,7 @@ func runHttpServer(wg *sync.WaitGroup, done chan os.Signal) {
 	router.HandleFunc("/", httpGETHandler).Methods("GET")
 	router.HandleFunc("/success", httpGETHandler).Methods("GET")
 	router.HandleFunc("/fail", httpGETHandler).Methods("GET")
+	router.HandleFunc("/post-demo", httpPostHandler).Methods("POST")
 
 	srv := &http.Server{
 		Addr:    ":8080",
@@ -95,6 +101,49 @@ func httpGETHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Request in path: /fail")
 		w.WriteHeader(http.StatusForbidden)
 	}
+}
+
+func httpPostHandler(w http.ResponseWriter, r *http.Request) {
+	contentType := r.Header.Get(httpprobe.ContentType)
+
+	var code int
+	var resp []byte
+	var err error
+	switch contentType {
+	case httpprobe.ContentJson:
+		type DemoData struct {
+			ExpectedCode    string `json:"expectedCode"`
+			ExpectedRespone string `json:"expectedResponse"`
+		}
+		var demoData DemoData
+		err := json.NewDecoder(r.Body).Decode(&demoData)
+		utilruntime.Must(err)
+		code, err = strconv.Atoi(demoData.ExpectedCode)
+		utilruntime.Must(err)
+		resp = []byte(demoData.ExpectedRespone)
+
+	case httpprobe.ContentUrlEncodedForm:
+		err := r.ParseForm()
+		utilruntime.Must(err)
+
+		for key, value := range r.Form {
+			if key == "expectedCode" {
+				code, err = strconv.Atoi(value[0])
+				utilruntime.Must(err)
+			}
+			if key == "expectedResponse" {
+				resp = []byte(value[0])
+			}
+		}
+	default:
+		resp, err = ioutil.ReadAll(r.Body)
+		utilruntime.Must(err)
+		defer r.Body.Close()
+	}
+	w.WriteHeader(code)
+	w.Header().Set(httpprobe.ContentType, contentType)
+	_, err = w.Write(resp)
+	utilruntime.Must(err)
 }
 
 func runTCPServer(wg *sync.WaitGroup, done chan os.Signal) {

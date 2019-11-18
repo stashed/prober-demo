@@ -3,7 +3,7 @@ set -xeou pipefail
 
 GOPATH=$(go env GOPATH)
 REPO_ROOT=$GOPATH/src/stash.appscode.dev/prober-demo
-REGISTRY=emruzhossain
+REGISTRY=appscodeci
 BINARY_NAME=prober-demo
 
 # build binary
@@ -16,3 +16,4 @@ popd
 
 # load image into kind cluster
 kind load docker-image $REGISTRY/$BINARY_NAME
+docker push $REGISTRY/$BINARY_NAME

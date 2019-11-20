@@ -14,6 +14,4 @@ docker build -t $REGISTRY/$BINARY_NAME .
 
 popd
 
-# load image into kind cluster
-kind load docker-image $REGISTRY/$BINARY_NAME
 docker push $REGISTRY/$BINARY_NAME

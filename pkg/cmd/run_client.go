@@ -148,7 +148,7 @@ func httpPostHandler(w http.ResponseWriter, r *http.Request) {
 
 func runTCPServer(wg *sync.WaitGroup, done chan os.Signal) {
 	defer wg.Done()
-	listener, err := net.Listen("tcp", "127.0.0.1:9090")
+	listener, err := net.Listen("tcp", ":9090")
 	if err != nil {
 		log.Fatal("tcp server listener error:", err)
 	}

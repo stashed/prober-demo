@@ -106,7 +106,7 @@ func httpGETHandler(w http.ResponseWriter, r *http.Request) {
 func httpPostHandler(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get(httpprobe.ContentType)
 
-	var code int
+	code:=http.StatusOK
 	var resp []byte
 	var err error
 	switch contentType {
